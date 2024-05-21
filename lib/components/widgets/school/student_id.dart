@@ -128,7 +128,7 @@ class _FrontPartState extends State<FrontPart> {
               ),
             ),
             Text(
-              widget.name,
+              widget.name[0] + widget.name[1] + widget.name[2],
               style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
             const SizedBox(
@@ -338,12 +338,12 @@ class _BackPartState extends State<BackPart> {
   }
 }
 
-Widget buildTableCell(String text) {
+Widget buildTableCell(String? text) {
   return Container(
     padding: const EdgeInsets.only(bottom: 2),
     child: Center(
       child: Text(
-        text,
+        text ?? '/',
         style: const TextStyle(fontSize: 10.0, fontWeight: FontWeight.bold),
       ),
     ),

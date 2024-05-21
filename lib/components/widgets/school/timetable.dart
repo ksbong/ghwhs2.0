@@ -82,6 +82,6 @@ class _TimeTableState extends State<TimeTable> {
           centerTitle: true,
           elevation: 0,
         ),
-        body: Padding(padding: const EdgeInsets.all(10), child: Text('')));
+        body: const Padding(padding: EdgeInsets.all(10), child: Text('')));
   }
 }

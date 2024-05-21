@@ -18,112 +18,47 @@ class StudentIDPage extends StatefulWidget {
 class _StudentIDPageState extends State<StudentIDPage> {
   bool isLoggedIn = false; // 로그인 상태를 저장할 변수
 
-  String bDay = '';
-
-  late Timer timer;
-
   @override
   void initState() {
     super.initState();
     checkLoginStatus();
-    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
-      _loadData();
-    });
   }
 
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-  }
+  Future<Map<String, dynamic>> fetchData() async {
+    String? grade1 = await storage.read(key: 'grade1');
+    String? grade2 = await storage.read(key: 'grade2');
+    String? grade3 = await storage.read(key: 'grade3');
 
-  void _loadData() {
-    // 앱이 시작될 때 로그인 상태 확인
-    fetchDataTeacher();
-    setInit();
-    setGrade();
-    fetchData();
-  }
-
-  String name = '';
-
-  String grade1 = '/';
-  String grade2 = '/';
-  String grade3 = '/';
-
-  String validYearStart = '';
-  String validYearEnd = '';
-
-  String studentID = 'S12345';
-
-  void setValidDate(String? birth) {
-    if (birth != null) {
-      List temp = birth.split('.');
-
-      setState(() {
-        validYearStart = (int.parse(temp[0]) + 16).toString();
-        validYearEnd = (int.parse(temp[0]) + 16 + 3).toString();
-      });
-    }
-  }
-
-  void setGrade() async {
-    String? temp1 = await storage.read(key: 'grade1');
-    String? temp2 = await storage.read(key: 'grade2');
-    String? temp3 = await storage.read(key: 'grade3');
-
-    setState(() {
-      grade1 = '$temp1';
-      grade2 = '$temp2';
-      grade3 = '$temp3';
-    });
-  }
-
-  void fetchData() async {
     String? storedName = await storage.read(key: 'name');
-    List<String> tempList = [];
+    List<String> nameList = [];
 
     String? storedBday = await storage.read(key: 'bday');
 
     String? storedID = await storage.read(key: 'studentID');
 
+    String? bDay = await storage.read(key: 'bday');
+
     if (storedName != null) {
       for (int i = 0; i < storedName.length; i++) {
-        tempList.add(storedName[i]);
+        nameList.add(storedName[i]);
       }
-
-      setState(() {
-        name = tempList as String;
-      });
-    }
-    if (storedBday != null) {
-      setState(() {
-        bDay = storedBday;
-      });
     }
 
-    if (storedID != null) {
-      setState(() {
-        studentID = storedID;
-      });
-    }
+    List<dynamic>? temp = bDay?.split('.');
 
-    setValidDate(bDay);
-  }
+    String validYearStart = (int.parse(temp?[0]) + 16).toString();
+    String validYearEnd = (int.parse(temp?[0]) + 16 + 3).toString();
 
-  Future<void> setInit() async {
-    String? teacher = await storage.read(key: 'teacher');
-    if (teacher == 'false') {
-      String? storedName = await storage.read(key: 'name');
-      setState(() {
-        name = storedName ?? "No name";
-      });
-    } else {
-      String? storedName = await storage.read(key: 'name');
-      setState(() {
-        name = storedName ?? 'No name';
-      });
-    }
+    return {
+      "name": nameList,
+      "grade1": grade1,
+      "grade2": grade2,
+      "grade3": grade3,
+      "bday": storedBday,
+      "studentID": storedID,
+      "validYearStart": validYearStart,
+      "validYearEnd": validYearEnd
+    };
   }
 
   Future<void> checkLoginStatus() async {
@@ -187,16 +122,27 @@ class _StudentIDPageState extends State<StudentIDPage> {
             child: Center(
                 child: isLoggedIn
                     ? isTeacher == 'false'
-                        ? IDCard(
-                            storedName: name,
-                            storedBday: bDay,
-                            grade1: grade1,
-                            grade2: grade2,
-                            grade3: grade3,
-                            storedID: studentID,
-                            validYearStart: validYearStart,
-                            validYearEnd: validYearEnd,
-                          )
+                        ? FutureBuilder(
+                            future: fetchData(),
+                            builder: (context, snapshot) {
+                              return snapshot.hasData
+                                  ? IDCard(
+                                      storedName: snapshot.data?["name"],
+                                      storedBday: snapshot.data?["bday"],
+                                      grade1: snapshot.data?["grade1"],
+                                      grade2: snapshot.data?["grade2"],
+                                      grade3: snapshot.data?["grade3"],
+                                      storedID: snapshot.data?["studentID"],
+                                      validYearStart:
+                                          snapshot.data?["validYearStart"],
+                                      validYearEnd:
+                                          snapshot.data?["validYearEnd"],
+                                    )
+                                  : const Center(
+                                      child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ));
+                            })
                         : const Text(
                             '선생님께는 학생증 기능이 제공되지 않습니다.',
                             style: TextStyle(color: Colors.white, fontSize: 20),
