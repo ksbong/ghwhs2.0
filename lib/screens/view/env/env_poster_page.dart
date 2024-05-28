@@ -8,7 +8,6 @@ class EnvPosterPage extends StatefulWidget {
   @override
   State createState() => _EnvPosterState();
 }
-
 class _EnvPosterState extends State<EnvPosterPage> {
   Future getPoster() async {
     final url = Uri.parse(
@@ -21,7 +20,7 @@ class _EnvPosterState extends State<EnvPosterPage> {
       Map<String, dynamic> data = jsonDecode(json);
       String imgUrl =
           'https://firebasestorage.googleapis.com/v0/b/hwandong-1cdba.appspot.com/o/poster%2Fposter.png?alt=media&token=${data['downloadTokens']}';
-      debugPrint(imgUrl);
+      //debugPrint(imgUrl);
       return imgUrl;
     }
   }
@@ -42,7 +41,7 @@ class _EnvPosterState extends State<EnvPosterPage> {
             },
           ),
           title: const Text(
-            '환경포스터',
+            '이달의 포스터',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,

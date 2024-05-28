@@ -185,14 +185,15 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(
                   height: 10,
                 ),
-                const PlantManage(),
-                const SizedBox(
-                  height: 10,
-                ),
                 envPoster(context),
                 const SizedBox(
                   height: 10,
                 ),
+                const PlantManage(),
+                const SizedBox(
+                  height: 10,
+                ),
+
               ],
             ),
           ))),

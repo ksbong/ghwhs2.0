@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:ghwhs_app_flutter/utils/na_alert.dart';
+import 'package:ghwhs_app_flutter/screens/view/env/env_poster_page.dart';
 import '../../component.dart';
 
 Widget envPoster(context) {
   return GestureDetector(
       onTap: () {
-        displayNAAlert(context);
-        // Navigator.push(context,
-        //     MaterialPageRoute(builder: (context) => const EnvPosterPage()));
+        Navigator.push(context,
+           MaterialPageRoute(builder: (context) => const EnvPosterPage()));
       },
       child: buildComponent(
           120,
@@ -20,7 +19,7 @@ Widget envPoster(context) {
                   Padding(
                     padding: EdgeInsets.only(left: 22, bottom: 15),
                     child: Text(
-                      '환경포스터',
+                      '이달의 포스터',
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -45,7 +44,7 @@ Widget envPoster(context) {
                         width: 50,
                         height: 50,
                         child: Image.asset(
-                          'assets/earth.png',
+                          'assets/logo.png',
                           fit: BoxFit.fill,
                         )),
                     const SizedBox(
@@ -56,14 +55,14 @@ Widget envPoster(context) {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '지구를 살려요!',
+                          '이번달 선정 포스터',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          '환경포스터 보러가기',
+                          '포스터 보러 가기',
                           style: TextStyle(
                               color: Colors.blue,
                               fontSize: 14,
