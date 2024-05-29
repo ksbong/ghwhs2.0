@@ -54,11 +54,10 @@ class _EnvPosterState extends State<EnvPosterPage> {
               future: getPoster(),
               builder: (context, snapshot) {
                 return snapshot.hasData
-                    ? Expanded(
-                        child: Image.network(
-                        snapshot.data,
-                        fit: BoxFit.cover,
-                      ))
+                    ?
+                        Image.network(snapshot.data,
+                        // fit: BoxFit.cover,
+                      )
                     : const CircularProgressIndicator();
               },
             )));
