@@ -30,7 +30,7 @@ class _MealPageState extends State<MealPageTomorrow> {
   }
 
   Future<void> getMeal() async {
-    DateTime now = DateTime.now().add(const Duration(days: 1));
+    DateTime now = DateTime.now();
     String today = DateFormat('yyyyMMdd').format(now);
     String url =
         'https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&pIndex=1&pSize=100&ATPT_OFCDC_SC_CODE=M10&SD_SCHUL_CODE=8000032&MLSV_YMD=$today';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ghwhs_app_flutter/components/component.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:ghwhs_app_flutter/components/widgets/school/timetable.dart';
+// import 'package:ghwhs_app_flutter/components/widgets/school/timetable.dart';
 import 'package:ghwhs_app_flutter/utils/na_alert.dart';
 import 'package:ghwhs_app_flutter/utils/d_day.dart';
 

@@ -1,37 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:ghwhs_app_flutter/utils/na_alert.dart';
+import 'package:ghwhs_app_flutter/screens/interactive/env_point_page.dart';
+// import 'package:ghwhs_app_flutter/utils/na_alert.dart';
 import '../../component.dart';
 // import 'package:http/http.dart' as http;
 
-class PlantManage extends StatefulWidget {
-  const PlantManage({super.key});
+class EnvPoint extends StatefulWidget {
+  const EnvPoint({super.key});
 
   @override
-  State createState() => _PlantManageState();
+  State createState() => _EnvPointState();
 }
 
-class _PlantManageState extends State<PlantManage> {
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   timer = Timer.periodic(const Duration(seconds: 2), (Timer t) {
-  //     fetchData();
-  //   });
-  // }
-
-  // @override
-  // void dispose() {
-  //   timer.cancel();
-  //   super.dispose();
-  // }
+class _EnvPointState extends State<EnvPoint> {
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () => displayNAAlert(context),
+        onTap: () =>Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const EnvPointPage(),
+            )),
         child: buildComponent(
             120,
-            MediaQuery.of(context).size.width,
+            MediaQuery
+                .of(context)
+                .size
+                .width,
             Stack(
               children: [
                 const Row(
@@ -40,7 +35,7 @@ class _PlantManageState extends State<PlantManage> {
                     Padding(
                       padding: EdgeInsets.only(left: 22, bottom: 15),
                       child: Text(
-                        '화분관리',
+                        '환경 점수',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -76,14 +71,14 @@ class _PlantManageState extends State<PlantManage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '화분을 가꾸어요!',
+                            '나의 분리수거 점수는?',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500),
                           ),
                           Text(
-                            '화분 상태 보러가기',
+                            '내 점수 보러가기',
                             style: TextStyle(
                                 color: Colors.blue,
                                 fontSize: 14,
@@ -96,42 +91,5 @@ class _PlantManageState extends State<PlantManage> {
                 )
               ],
             )));
-  }
-
-  // Widget renderFineDust() {
-  //   // fetchData();
-  //   return Text(
-  //     fineDust,
-  //     style: const TextStyle(
-  //       color: Colors.white,
-  //       fontSize: 50,
-  //     ),
-  //   );
-  // }
-
-  Future<void> fetchData() async {
-    // String databaseURL =
-    //     'https://hwandong-1cdba-default-rtdb.asia-southeast1.firebasedatabase.app';
-
-    // // Make a GET request to fetch data
-    // final response = await http.get(Uri.parse('$databaseURL/미세먼지.json'));
-
-    // if (response.statusCode == 200) {
-    //   // Parse the response body
-    //   // print(response.body);
-    //   // print(response.body.runtimeType);
-
-    //   setState(() {
-    //     if (response.body.length == 1) {
-    //       fineDust = "0${response.body}";
-    //     } else {
-    //       fineDust = response.body;
-    //     }
-    //     currentTime = DateTime.now();
-    //   });
-    // } else {
-    //   // Handle errors
-    //   debugPrint('Failed to fetch data: ${response.statusCode}');
-    // }
   }
 }

@@ -31,7 +31,7 @@ class _MealPageState extends State<MealPage> {
   }
 
   Future<void> getMeal() async {
-    DateTime now = DateTime.now().add(const Duration(days: 1));
+    DateTime now = DateTime.now();
     String today = DateFormat('yyyyMMdd').format(now);
     String url =
         'https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&pIndex=1&pSize=100&ATPT_OFCDC_SC_CODE=M10&SD_SCHUL_CODE=8000032&MLSV_YMD=$today';
@@ -47,61 +47,70 @@ class _MealPageState extends State<MealPage> {
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
-      try {
+      if(DateFormat('E').format(now) == 'Mon') {
         var root = body['mealServiceDietInfo'][1]['row'];
+        setState(() {
+          breakFast = '오늘은 조식이 없습니다.';
+          lunch = root[0]['DDISH_NM'];
+          dinner = root[0]['DDISH_NM'];
+        });
+      } else {
         try {
-          setState(() {
-            breakFast = root[0]['DDISH_NM'];
-            lunch = root[1]['DDISH_NM'];
-            dinner = root[2]['DDISH_NM'];
-          });
-        } catch (e) {
+          var root = body['mealServiceDietInfo'][1]['row'];
           try {
+            setState(() {
+              breakFast = root[0]['DDISH_NM'];
+              lunch = root[1]['DDISH_NM'];
+              dinner = root[2]['DDISH_NM'];
+            });
+          } catch (e) {
             try {
-              if (tomorrowResponse.statusCode == 200) {
-                final body = json.decode(tomorrowResponse.body);
-                var root = body['mealServiceDietInfo'][1]['row'];
+              try {
+                if (tomorrowResponse.statusCode == 200) {
+                  final body = json.decode(tomorrowResponse.body);
+                  var root = body['mealServiceDietInfo'][1]['row'];
 
-                if (tomorrowYoil != 'Fri') {
-                  debugPrint(root[0]['DDISH_NM']);
-                  debugPrint(root[1]['DDISH_NM']);
-                  debugPrint(root[2]['DDISH_NM']);
+                  if (tomorrowYoil != 'Fri') {
+                    debugPrint(root[0]['DDISH_NM']);
+                    debugPrint(root[1]['DDISH_NM']);
+                    debugPrint(root[2]['DDISH_NM']);
+                  }
+
+                  setState(() {
+                    breakFast = '오늘은 조식이 없습니다.';
+                    lunch = root[0]['DDISH_NM'];
+                    dinner = root[1]['DDISH_NM'];
+                  });
                 }
-
+              } catch (e) {
                 setState(() {
-                  breakFast = '오늘은 조식이 없습니다.';
-                  lunch = root[0]['DDISH_NM'];
-                  dinner = root[1]['DDISH_NM'];
+                  breakFast = root[0]['DDISH_NM'];
+                  lunch = root[1]['DDISH_NM'];
+                  dinner = '오늘은 석식이 없습니다.';
                 });
               }
+
             } catch (e) {
               setState(() {
-                breakFast = root[0]['DDISH_NM'];
-                lunch = root[1]['DDISH_NM'];
+                breakFast = '오늘은 조식이 없습니다.';
+                lunch = root[0]['DDISH_NM'];
                 dinner = '오늘은 석식이 없습니다.';
               });
             }
-
-          } catch (e) {
-            setState(() {
-              breakFast = '오늘은 조식이 없습니다.';
-              lunch = root[0]['DDISH_NM'];
-              dinner = '오늘은 석식이 없습니다.';
-            });
           }
-        }
-      } catch (e) {
-        // print(e);
-        setState(() {
-          breakFast = '오늘은 조식이 없습니다.';
-          lunch = '오늘은 중식이 없습니다.';
-          dinner = '오늘은 석식이 없습니다.';
-        });
-      }
-    } else {
+        } catch (e) {
+          // print(e);
+          setState(() {
+            breakFast = '오늘은 조식이 없습니다.';
+            lunch = '오늘은 중식이 없습니다.';
+            dinner = '오늘은 석식이 없습니다.';
+          });
+        }}
+      } else {
       // ignore: avoid_print
       print("Failed: ${response.statusCode}");
-    }
+
+      }
   }
 
   @override

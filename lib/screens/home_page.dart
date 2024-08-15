@@ -10,7 +10,7 @@ import 'package:ghwhs_app_flutter/components/widgets/env/env_poster.dart';
 import 'package:ghwhs_app_flutter/components/widgets/env/fine_dust.dart';
 import 'package:ghwhs_app_flutter/components/widgets/school/meal_board.dart';
 import 'package:ghwhs_app_flutter/components/widgets/school/student_id.dart';
-import 'package:ghwhs_app_flutter/components/widgets/env/plant_management.dart';
+import 'package:ghwhs_app_flutter/components/widgets/env/envPoint.dart';
 import 'view/info_page.dart';
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -189,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(
                   height: 10,
                 ),
-                const PlantManage(),
+                const EnvPoint(),
                 const SizedBox(
                   height: 10,
                 ),
