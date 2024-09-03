@@ -13,30 +13,32 @@ class TimeTable extends StatefulWidget {
 
 class _TimeTableState extends State<TimeTable> {
   static const storage = FlutterSecureStorage();
-  String grade = '1';
-  String classNumber = '1';
+  // String grade = '1';
+  // String classNumber = '1';
   var timetable = {};
   DateTime now = DateTime.now();
 
-  @override
-  void initState() {
-    super.initState();
-    fetchData().then((value) => timeTable(grade, classNumber));
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   fetchData().then((value) => timeTable();
+  // }
 
-  Future<void> fetchData() async {
+  Future<List> fetchData() async {
     String? bday = await storage.read(key: 'bday');
     String temp = bday?.split('.') as String;
     String tempGrade = (now.year - int.parse(temp[0]) - 16).toString();
     String? classNumber = await storage.read(key: 'grade$tempGrade');
     String tempClassNumber = classNumber!.split('/')[0];
-    setState(() {
-      grade = tempGrade;
-      classNumber = tempClassNumber;
-    });
+    // setState(() {
+    //   grade = tempGrade;
+    //   classNumber = tempClassNumber;
+    // });
+
+    return [tempGrade, tempClassNumber];
   }
 
-  void timeTable(String grade, String classNum) async {
+  Future<Widget> timeTable(String grade, String classNum) async {
     DateTime now = DateTime.now();
 
     String today = DateFormat('yyyyMMdd').format(now);
@@ -57,6 +59,8 @@ class _TimeTableState extends State<TimeTable> {
       debugPrint('Failed to get TimeTable');
     }
     debugPrint(timeTable as String?);
+
+    return const Text("YEET");
   }
 
   @override
@@ -82,6 +86,16 @@ class _TimeTableState extends State<TimeTable> {
           centerTitle: true,
           elevation: 0,
         ),
-        body: const Padding(padding: EdgeInsets.all(10), child: Text('')));
+        body: FutureBuilder(
+    future: fetchData(),
+          builder: (BuildContext context, snapshot) {
+            if (!snapshot.hasData) {
+              return const CircularProgressIndicator();
+            } else {
+              return Text('${snapshot.data![0]} ${snapshot.data![1]}');
+            }
+
+          },
+    ));
   }
 }
