@@ -152,4 +152,5 @@ class _EnvPointPageState extends State<EnvPointPage> {
       NfcManager.instance.stopSession();
     });
   }
+
 }
