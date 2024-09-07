@@ -70,7 +70,7 @@ class MealBoardState extends State<MealBoard> {
                 }
 
                 setState(() {
-                  breakFast = '오늘은 조식이 없습니다.';
+                  breakFast = '오늘은 조식이 없어유';
                   lunch = root[0]['DDISH_NM'];
                   dinner = root[1]['DDISH_NM'];
                 });
@@ -79,24 +79,24 @@ class MealBoardState extends State<MealBoard> {
               setState(() {
                 breakFast = root[0]['DDISH_NM'];
                 lunch = root[1]['DDISH_NM'];
-                dinner = '오늘은 석식이 없습니다.';
+                dinner = '오늘은 석식이 없어유';
               });
             }
 
           } catch (e) {
             setState(() {
-              breakFast = '오늘은 조식이 없습니다.';
+              breakFast = '오늘은 조식이 없어유';
               lunch = root[0]['DDISH_NM'];
-              dinner = '오늘은 석식이 없습니다.';
+              dinner = '오늘은 석식이 없어유';
             });
           }
         }
       } catch (e) {
         // print(e);
         setState(() {
-          breakFast = '오늘은 조식이 없습니다.';
-          lunch = '오늘은 중식이 없습니다.';
-          dinner = '오늘은 석식이 없습니다.';
+          breakFast = '오늘은 조식이 없어유';
+          lunch = '오늘은 중식이 없어유';
+          dinner = '오늘은 석식이 없어유';
         });
       }
     } else {

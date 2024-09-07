@@ -24,7 +24,7 @@ String getSNDday() {
       ? '-day'
       : temp < 0
           ? '+${temp.abs()}'
-          : '-${temp.abs()}';
+          : '-${temp.abs()+1}';
 
   return dday;
 }

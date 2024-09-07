@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:ghwhs_app_flutter/screens/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
+  await dotenv.load(fileName: ".env");
 
-  await Supabase.initialize(url: 'https://pnoqycbessomqckuydrc.supabase.co', anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBub3F5Y2Jlc3NvbXFja3V5ZHJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjEyODMwNTIsImV4cCI6MjAzNjg1OTA1Mn0.L5aYxLZkFmyJEBojb0NxO1HMsJoUou_Sa_EPwwF4G8Q');
+  String apiKey = dotenv.env['SUPABASE_API_KEY'] ?? '';
+  await Supabase.initialize(url: 'https://pnoqycbessomqckuydrc.supabase.co', anonKey: apiKey);
 
   runApp(const MyApp());
 }
