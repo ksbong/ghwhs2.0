@@ -401,9 +401,9 @@ class _LogInPageState extends State<LogInPage> {
                           offset: const Offset(-20, 0),
                           scrollbarTheme: ScrollbarThemeData(
                             radius: const Radius.circular(20),
-                            thickness: MaterialStateProperty.all<double>(6),
+                            thickness: WidgetStateProperty.all<double>(6),
                             thumbVisibility:
-                                MaterialStateProperty.all<bool>(true),
+                                WidgetStateProperty.all<bool>(true),
                           ),
                         ),
                         menuItemStyleData: const MenuItemStyleData(
@@ -497,9 +497,9 @@ class _LogInPageState extends State<LogInPage> {
                           offset: const Offset(-20, 0),
                           scrollbarTheme: ScrollbarThemeData(
                             radius: const Radius.circular(40),
-                            thickness: MaterialStateProperty.all<double>(6),
+                            thickness: WidgetStateProperty.all<double>(6),
                             thumbVisibility:
-                                MaterialStateProperty.all<bool>(true),
+                                WidgetStateProperty.all<bool>(true),
                           ),
                         ),
                         menuItemStyleData: const MenuItemStyleData(
@@ -601,7 +601,7 @@ class _LogInPageState extends State<LogInPage> {
               // 학생증 등록 feature
               ElevatedButton(
                   style: ButtonStyle(
-                      minimumSize: MaterialStateProperty.all(
+                      minimumSize: WidgetStateProperty.all(
                           Size(MediaQuery.of(context).size.width, 45))),
                   onPressed: !teacher
                       ? () {
@@ -617,7 +617,7 @@ class _LogInPageState extends State<LogInPage> {
               ),
               ElevatedButton(
                   style: ButtonStyle(
-                      minimumSize: MaterialStateProperty.all(
+                      minimumSize: WidgetStateProperty.all(
                           Size(MediaQuery.of(context).size.width, 45))),
                   child: const Text('등록하기'),
                   onPressed: () => checkLogin()),
