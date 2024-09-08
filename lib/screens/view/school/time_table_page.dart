@@ -28,6 +28,7 @@ class _TimeTableState extends State<TimeTable> {
 
   Future<List<dynamic>> timeTable() async {
     String today = DateFormat('yyyyMMdd').format(DateTime.now());
+
     String apiKey = dotenv.env['NEIS_API_KEY'] ?? '';
 
     var url = Uri.parse(
@@ -38,13 +39,12 @@ class _TimeTableState extends State<TimeTable> {
     if (response.statusCode == 200) {
       var jsonResponse = convert.jsonDecode(response.body) as Map<String, dynamic>;
 
-      // JSON 응답이 무엇인지 로그로 출력해 디버깅
-      print(jsonResponse);
+      // print(jsonResponse);
 
       if (jsonResponse.containsKey('hisTimetable') && jsonResponse['hisTimetable'][1].containsKey('row')) {
         return jsonResponse['hisTimetable'][1]['row'] as List<dynamic>;
       } else {
-        return []; // 데이터가 없으면 빈 리스트 반환
+        return [];
       }
     } else {
       throw Exception('Failed to load timetable');
@@ -103,7 +103,7 @@ class _TimeTableState extends State<TimeTable> {
                     setState(() {
                       selectedGrade = newValue!;
                     });
-                    updateTimetable(); // Update timetable when grade is changed
+                    updateTimetable();
                   },
                 ),
                 const Text('학년', style: TextStyle(color: Colors.white),),
@@ -123,7 +123,7 @@ class _TimeTableState extends State<TimeTable> {
                     setState(() {
                       selectedClass = newValue!;
                     });
-                    updateTimetable(); // Update timetable when class is changed
+                    updateTimetable();
                   },
                 ),
                 const Text('반', style: TextStyle(color: Colors.white),)
@@ -132,12 +132,13 @@ class _TimeTableState extends State<TimeTable> {
           ),
           Expanded(
             child: FutureBuilder<List<dynamic>>(
-              future: timetableFuture, // Use the updated future
+              future: timetableFuture,
               builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
                 if (DateFormat('E').format(DateTime.now()) == 'Sat' || DateFormat('E').format(DateTime.now()) == 'Sun') {
                     return const Center(child: Text('시간표가 없나봐유~', style: TextStyle(color: Colors.white),),);
                 }
-                else if (snapshot.connectionState == ConnectionState.waiting) {
+                else
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return const Center(child: Text('시간표를 불러오는데 오류가 발생했습니다.', style: TextStyle(color: Colors.white)));

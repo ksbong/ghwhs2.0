@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:typed_data';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EnvPointPage extends StatefulWidget {
   const EnvPointPage({super.key});
@@ -13,6 +13,10 @@ class EnvPointPage extends StatefulWidget {
 class _EnvPointPageState extends State<EnvPointPage> {
   ValueNotifier<String> result = ValueNotifier("NFC를 태그해주세요.");
   late String _nfcID;
+  final TextEditingController _codeController = TextEditingController();
+  bool isRegistering = false;
+
+  String reqKey = dotenv.env['REQUIRED_KEY'] ?? '';
 
   @override
   void initState() {
@@ -22,32 +26,26 @@ class _EnvPointPageState extends State<EnvPointPage> {
   void _tagRead() {
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       try {
-        var id = tag.data['id'] as Uint8List?;
-        if (id == null) {
-          result.value = 'NFC 태그가 아닙니다.';
-          NfcManager.instance.stopSession(errorMessage: 'NFC 태그가 아닙니다.');
+        final ndef = Ndef.from(tag);
+        if (ndef == null) {
+          result.value = 'NFC 태그가 NDEF 메시지를 지원하지 않습니다.';
+          NfcManager.instance.stopSession(errorMessage: 'NFC 태그가 NDEF 메시지를 지원하지 않습니다.');
           return;
         }
 
-        String nfcID = identifierToHexString(id);
+        final NdefMessage ndefMessage = await ndef.read();
 
+        final NdefRecord ndefRecord = ndefMessage.records.first;
+        final String nfcID = String.fromCharCodes(ndefRecord.payload);
 
         result.value = '태그 ID: $nfcID';
         _nfcID = nfcID;
-
 
         final existingIDResponse = await Supabase.instance.client
             .from('ids')
             .select()
             .eq('id', nfcID);
 
-
-
-        // if (existingIDResponse.hasError) {
-        //   result.value = '데이터베이스 오류가 발생했습니다.';
-        //   NfcManager.instance.stopSession(errorMessage: '데이터베이스 오류가 발생했습니다.');
-        //   return;
-        // }
 
         if (existingIDResponse.isEmpty) {
           result.value = 'ID가 존재하지 않습니다. 등록 버튼을 눌러주세요.';
@@ -65,18 +63,33 @@ class _EnvPointPageState extends State<EnvPointPage> {
   }
 
   Future<void> _registerID() async {
+    setState(() {
+      isRegistering = true;
+    });
+
+    final code = _codeController.text;
+    var requiredCode = reqKey; // 여기서 코드를 서버에서 받아올 수도 있습니다.
+
+    if (code != requiredCode) {
+      result.value = '코드가 일치하지 않습니다. 등록할 수 없습니다.';
+      setState(() {
+        isRegistering = false;
+      });
+      return;
+    }
+
     final existingIDResponse = await Supabase.instance.client
         .from('ids')
         .select()
         .eq('id', _nfcID);
 
-    // if (existingIDResponse.hasError) {
-    //   result.value = '데이터베이스 오류가 발생했습니다.';
-    //   return;
-    // }
+
 
     if (existingIDResponse.isNotEmpty) {
       result.value = 'ID가 이미 존재합니다.';
+      setState(() {
+        isRegistering = false;
+      });
       return;
     }
 
@@ -89,10 +102,10 @@ class _EnvPointPageState extends State<EnvPointPage> {
     } else {
       result.value = 'ID가 성공적으로 등록되었습니다.';
     }
-  }
 
-  String identifierToHexString(Uint8List identifier) {
-    return identifier.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join(':').toUpperCase();
+    setState(() {
+      isRegistering = false;
+    });
   }
 
   @override
@@ -102,10 +115,7 @@ class _EnvPointPageState extends State<EnvPointPage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -118,50 +128,88 @@ class _EnvPointPageState extends State<EnvPointPage> {
         backgroundColor: const Color(0xff181A20),
         elevation: 0,
       ),
-      body: Flex(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        direction: Axis.vertical,
-        children: [
-          Flexible(
-            flex: 2,
-            child: Container(
-              margin: const EdgeInsets.all(4),
-              constraints: const BoxConstraints.expand(),
-              decoration: BoxDecoration(border: Border.all()),
-              child: SingleChildScrollView(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // NFC
+            Card(
+              color: const Color(0xff1f2128),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(20.0),
                 child: ValueListenableBuilder<String>(
                   valueListenable: result,
-                  builder: (context, value, _) => Center(
-                    child: Text(
-                      value,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  )
+                  builder: (context, value, _) => Text(
+                    value,
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ),
-          ),
-          Flexible(
-            flex: 3,
-            child: GridView.count(
-              padding: const EdgeInsets.all(4),
-              crossAxisCount: 2,
-              childAspectRatio: 4,
-              crossAxisSpacing: 4,
-              mainAxisSpacing: 4,
+            Column(
               children: [
-                ElevatedButton(
-                  onPressed: _tagRead,
-                  child: const Text('태그 읽기'),
+                TextField(
+                  controller: _codeController,
+                  decoration: InputDecoration(
+                    labelText: '등록 코드 입력',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(20.0)
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    fillColor: const Color(0xff1f2128),
+                    filled: true,
+                  ),
+                  style: const TextStyle(color: Colors.white),
                 ),
-                ElevatedButton(
-                  onPressed: _registerID,
-                  child: const Text('등록'),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: isRegistering ? null : _tagRead,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16.0, horizontal: 24.0),
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('태그 읽기'),
+                    ),
+                    ElevatedButton(
+                      onPressed: isRegistering ? null : _registerID,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16.0, horizontal: 24.0),
+                        backgroundColor: isRegistering
+                            ? Colors.grey
+                            : Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: isRegistering
+                          ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+                          : const Text('등록'),
+                    ),
+                  ],
                 ),
               ],
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }

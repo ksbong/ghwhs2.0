@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ghwhs_app_flutter/screens/interactive/env_point_page.dart';
-// import 'package:ghwhs_app_flutter/utils/na_alert.dart';
 import '../../component.dart';
 // import 'package:http/http.dart' as http;
 
