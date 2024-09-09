@@ -36,81 +36,64 @@ class _MealPageState extends State<MealPage> {
     String url =
         'https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&pIndex=1&pSize=100&ATPT_OFCDC_SC_CODE=M10&SD_SCHUL_CODE=8000032&MLSV_YMD=$today';
 
-    DateTime tomorrow = now.add(const Duration(days: 1));
-    String tomorrowDate = DateFormat('yyyyMMdd').format(tomorrow);
-    String tomorrowURL =
-        'https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&pIndex=1&pSize=100&ATPT_OFCDC_SC_CODE=M10&SD_SCHUL_CODE=8000032&MLSV_YMD=$tomorrowDate';
     final response = await http.get(Uri.parse(url));
-    final tomorrowResponse = await http.get(Uri.parse(tomorrowURL));
-
-    String tomorrowYoil = DateFormat('E').format(tomorrow);
 
     if (response.statusCode == 200) {
-      final body = json.decode(response.body);
-      if(DateFormat('E').format(now) == 'Mon') {
-        var root = body['mealServiceDietInfo'][1]['row'];
-        setState(() {
-          breakFast = '오늘은 조식이 없어유';
-          lunch = root[0]['DDISH_NM'];
-          dinner = root[0]['DDISH_NM'];
-        });
-      } else {
-        try {
-          var root = body['mealServiceDietInfo'][1]['row'];
-          try {
+      var body = json.decode(response.body)["mealServiceDietInfo"];
+      int lenOfMeal = body[0]["head"][0]["list_total_count"];
+
+      var mealBody = body[1]["row"];
+      // ["MMEAL_SC_NM"]
+      switch(lenOfMeal) {
+        case 1: {
+          if (mealBody[0]["MMEAL_SC_NM"] == '조식') {
             setState(() {
-              breakFast = root[0]['DDISH_NM'];
-              lunch = root[1]['DDISH_NM'];
-              dinner = root[2]['DDISH_NM'];
+              breakFast = mealBody[0]["DDISH_NM"];
+              lunch = '오늘은 중식이 없어유';
+              dinner = '오늘은 석식이 없어유';
             });
-          } catch (e) {
-            try {
-              try {
-                if (tomorrowResponse.statusCode == 200) {
-                  final body = json.decode(tomorrowResponse.body);
-                  var root = body['mealServiceDietInfo'][1]['row'];
-
-                  if (tomorrowYoil != 'Fri') {
-                    debugPrint(root[0]['DDISH_NM']);
-                    debugPrint(root[1]['DDISH_NM']);
-                    debugPrint(root[2]['DDISH_NM']);
-                  }
-
-                  setState(() {
-                    breakFast = '오늘은 조식이 없어유';
-                    lunch = root[0]['DDISH_NM'];
-                    dinner = root[1]['DDISH_NM'];
-                  });
-                }
-              } catch (e) {
-                setState(() {
-                  breakFast = root[0]['DDISH_NM'];
-                  lunch = root[1]['DDISH_NM'];
-                  dinner = '오늘은 석식이 없어유';
-                });
-              }
-
-            } catch (e) {
-              setState(() {
-                breakFast = '오늘은 조식이 없어유';
-                lunch = root[0]['DDISH_NM'];
-                dinner = '오늘은 석식이 없어유';
-              });
-            }
+          } else {
+            setState(() {
+              breakFast = '오늘은 조식이 없어유';
+              lunch = mealBody[0]["DDISH_NM"];
+              dinner = '오늘은 석식이 없어유';
+            });
           }
-        } catch (e) {
-          // print(e);
+        } break;
+        case 2: {
+          if (mealBody[0]["MMEAL_SC_NM"] == '조식') {
+            setState(() {
+              breakFast = mealBody[0]["DDISH_NM"];
+              lunch = mealBody[1]["DDISH_NM"];
+              dinner = '오늘은 석식이 없어유';
+            });
+          } else {
+            setState(() {
+              breakFast = '오늘은 조식이 없어유';
+              lunch = mealBody[0]["DDISH_NM"];
+              dinner = mealBody[1]["DDISH_NM"];
+            });
+          }
+        } break;
+
+        case 3: {
           setState(() {
-            breakFast = '오늘은 조식이 없어유';
-            lunch = '오늘은 중식이 없어유';
-            dinner = '오늘은 석식이 없어유';
+            breakFast = mealBody[0]["DDISH_NM"];
+            lunch = mealBody[1]["DDISH_NM"];
+            dinner = mealBody[2]["DDISH_NM"];
           });
-        }}
-      } else {
-      // ignore: avoid_print
-      print("Failed: ${response.statusCode}");
+        } break;
+
+        default: {
+          setState(() {
+            breakFast = '문제가 생겼나봐유';
+            lunch = '문제가 생겼나봐유';
+            dinner = '문제가 생겼나봐유';
+          });
+        } break;
 
       }
+    }
   }
 
   @override
